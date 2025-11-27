@@ -3,7 +3,7 @@
 
 def configMap = [
     application: "nodeJSVM",
-    component: "catalogue"
+    component: "backend"
 ]
 
 // Safely get branch name, default to 'main' if null (first-time build)

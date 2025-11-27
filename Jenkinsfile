@@ -21,7 +21,7 @@ pipeline {
                     // Safely get the branch name, default to 'main' if null
                     def branch = env.BRANCH_NAME ?: 'main'
 
-                   if (branch == null && branch.equalsIgnoreCase('main')) {
+                   if (branch == null || branch.equalsIgnoreCase('main')) {
                         pipelineDecission.decidePipleine(configMap)
                     } else {
                         echo "Non-main branch or first-time build"

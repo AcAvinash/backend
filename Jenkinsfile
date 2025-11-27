@@ -1,5 +1,4 @@
 #!groovy
-// it means the libraries will be downloaded and accessible at run time
 @Library('expense-shared-library') _
 
 def configMap = [
@@ -7,12 +6,13 @@ def configMap = [
     component: "catalogue"
 ]
 
+// Safely get branch name, default to 'main' if null (first-time build)
+def branch = env.BRANCH_NAME ?: 'main'
 
-// this is .groovy file name and function inside it
-//if not master then trigger pipeline
-if (branch == null || branch== "main") {
+if (branch.equalsIgnoreCase("main")) {
+    echo "Main branch detected, triggering shared library"
     pipelineDecission.decidePipleine(configMap)
 } else {
-    echo "Non-main branch, do something else"
+    echo "Non-main branch (${branch}), skipping shared library execution"
 }
 

@@ -21,11 +21,10 @@ pipeline {
                     // Safely get the branch name, default to 'main' if null
                     def branch = env.BRANCH_NAME ?: 'main'
 
-                    if (!branch.equalsIgnoreCase('main')) {
-                        echo "Non-main branch detected: ${branch}, triggering pipeline decision..."
+                   if (branch == null && branch.equalsIgnoreCase('main')) {
                         pipelineDecission.decidePipleine(configMap)
                     } else {
-                        echo "main PROD deployment should happen through CR"
+                        echo "Non-main branch or first-time build"
                     }
                 }
             }

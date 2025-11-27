@@ -1,33 +1,19 @@
-@Library('expense-shared-library') _
+#!groovy
+// it means the libraries will be downloaded and accessible at run time
+@Library('roboshop-shared-library') _
 
-pipeline {
-    agent any
+def configMap = [
+    application: "nodeJSVM",
+    component: "catalogue"
+]
+env
 
-    environment {
-        // Env variables accessible here
-        APP = 'nodeJSVM'
-        COMPONENT = 'backend'
-    }
-
-    stages {
-        stage('Decide Pipeline') {
-            steps {
-                script {
-                    def configMap = [
-                        application: env.APP,
-                        component: env.COMPONENT,
-                    ]
-
-                    // Safely get the branch name, default to 'main' if null
-                    def branch = env.BRANCH_NAME ?: 'main'
-
-                   if (branch == null || branch.equalsIgnoreCase('main')) {
-                        pipelineDecision.decidePipleine(configMap)
-                    } else {
-                        echo "Non-main branch or first-time build"
-                    }
-                }
-            }
-        }
-    }
+// this is .groovy file name and function inside it
+//if not master then trigger pipeline
+if ( ! env.BRANCH_NAME.equalsIgnoreCase('master')){
+    pipelineDecision.decidePipleine(configMap)
 }
+else{
+    echo "master PROD deployment should happen through CR"
+}
+

@@ -11,7 +11,7 @@ def branch = env.BRANCH_NAME ?: 'main'
 
 if (branch.equalsIgnoreCase("main")) {
     echo "Main branch detected, triggering shared library"
-    pipelineDecission.decidePipleine(configMap)
+    pipelineDecision.decidePipleine(configMap)
 } else {
     echo "Non-main branch (${branch}), skipping shared library execution"
 }

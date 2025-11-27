@@ -1,22 +1,34 @@
-#!groovy
-// Load shared library at runtime
 @Library('expense-shared-library') _
 
-// Configuration map for the pipeline
-def configMap = [
-    application: "nodeJSVM",
-    component: "backend",
-]
+pipeline {
+    agent any
 
-// Ensure env variables are accessible
-env
+    environment {
+        // Env variables accessible here
+        APP = 'nodeJSVM'
+        COMPONENT = 'backend'
+    }
 
-// Safely get the branch name, default to 'main' if null
-def branch = env.BRANCH_NAME ?: 'main'
+    stages {
+        stage('Decide Pipeline') {
+            steps {
+                script {
+                    def configMap = [
+                        application: env.APP,
+                        component: env.COMPONENT,
+                    ]
 
-// If not main branch, trigger pipeline decision; else log message
-if (!branch.equalsIgnoreCase('main')) {
-    pipelineDecission.decidePipleine(configMap)
-} else {
-    echo "main PROD deployment should happen through CR"
+                    // Safely get the branch name, default to 'main' if null
+                    def branch = env.BRANCH_NAME ?: 'main'
+
+                    if (!branch.equalsIgnoreCase('main')) {
+                        echo "Non-main branch detected: ${branch}, triggering pipeline decision..."
+                        pipelineDecission.decidePipleine(configMap)
+                    } else {
+                        echo "main PROD deployment should happen through CR"
+                    }
+                }
+            }
+        }
+    }
 }

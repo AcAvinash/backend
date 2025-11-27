@@ -1,0 +1,53 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: expense
+  labels:
+    app: backend
+    tier: api
+    project: expense
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend
+      tier: api
+      project: expense
+  template:
+    metadata:
+      labels:
+        app: backend
+        tier: api
+        project: expense
+    spec:
+      initContainers:
+      - name: mysql-check
+        image: busybox:1.28
+        command: ['sh', '-c', "until nslookup mysql; do echo waiting for myservice; sleep 2; done"]
+      containers:
+      - name: backend
+        image: acavinash/backend:{{ .Values.deployment.imageVersion }}
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          # limits is greater than or equal to requests
+          limits:
+            cpu: 100m
+            memory: 128Mi
+        envFrom:
+        - configMapRef:
+            name: backend
+        readinessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 3
+          periodSeconds: 3
